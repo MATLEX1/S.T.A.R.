@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Simian Ties Among Relatives</title>
+<script>
+(function(){
+  try{
+    if (localStorage.getItem('sta-theme') === 'dark'){
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  }catch(e){}
+})();
+</script>
+<style>
+:root{
+  --ink:#0a0a0a;
+  --muted:#8a8680;
+  --line:rgba(10,10,10,.12);
+  --bg:#efece6;
+  --red:#e30613;
+  --ease:cubic-bezier(.22,.72,.28,1);
+  --surface: rgba(255,255,255,.35);
+  --surface-soft: rgba(255,255,255,.25);
+  --surface-hover: rgba(255,255,255,.55);
+  --overlay: rgba(10,10,10,.035);
+  --overlay-accent: rgba(227,6,19,.08);
+  --ink-low: #6b6760;
+  --ink-mid: #5e5a54;
+  --ink-faint: #c3bfb6;
+  --text-body: #666;
+  --text-strong: #3a3a3a;
+  --text-tag: #4a4a4a;
+  --tag-label: #b5b1a9;
+  --btn-fg: #ffffff;
+  --toast-bg: #0a0a0a;
+  --toast-fg: #ffffff;
+  --red-deep: #9d0a15;
+  --red-soft: #d98d94;
+}
+html[data-theme="dark"]{
+  --ink: #f0ede7;
+  --muted: #8a8680;
+  --line: rgba(240,237,231,.14);
+  --bg: #171614;
+  --surface: rgba(255,255,255,.06);
+  --surface-soft: rgba(255,255,255,.04);
+  --surface-hover: rgba(255,255,255,.10);
+  --overlay: rgba(255,255,255,.05);
+  --overlay-accent: rgba(227,6,19,.20);
+  --ink-low: #a9a49c;
+  --ink-mid: #b5b0a8;
+  --ink-faint: #57534d;
+  --text-body: #b5b0a8;
+  --text-strong: #d6d2cc;
+  --text-tag: #c9c5be;
+  --tag-label: #767066;
+  --btn-fg: #171614;
+  --toast-bg: #f0ede7;
+  --toast-fg: #171614;
+  --red-deep: #ff8a93;
+  --red-soft: #c96a74;
+  color-scheme: dark;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  font-family:Inter,"Helvetica Neue",Helvetica,Arial,-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.5;
+  font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  transition:background-color .28s var(--ease), color .28s var(--ease);
+}
+
+#app{
+  width:100%;
+  max-width:600px;
+  margin:0 auto;
+  padding:36px 24px 88px;
+}
+
+/* ================= 主题切换按钮 ================= */
+.theme-toggle{
+  position:fixed;
+  top:20px; right:20px;
+  z-index:100;
+  padding:8px 14px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--ink);
+  font:inherit;
+  font-size:10.5px;
+  font-weight:800;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  cursor:pointer;
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  transition:border-color .22s var(--ease),
+             background-color .22s var(--ease),
+             color .22s var(--ease),
+             transform .1s var(--ease);
+}
+.theme-toggle:hover{border-color:var(--ink);}
+.theme-toggle:active{transform:scale(.95);}
+
+/* ================= 首页 ================= */
+.home{
+  display:grid;
+  gap:44px;
+}
+
+/* 标题：两行统一超粗 */
+.home-title{
+  font-size:44px;
+  line-height:1.02;
+  letter-spacing:-.035em;
+  margin-bottom:26px;
+}
+.home-title .t-thin{
+  display:block;
+  font-weight:900;
+  letter-spacing:-.045em;
+  margin-bottom:4px;
+}
+.home-title .t-thick{
+  display:block;
+  font-weight:900;
+  letter-spacing:-.045em;
+}
+
+/* 英文：两行统一极细 */
+.home-brand{padding-left:2px;}
+.home-brand .b-top{
+  display:block;
+  font-family:"Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;
+  font-weight:300;
+  font-size:13px;
+  letter-spacing:.3em;
+  color:var(--ink);
+  margin-bottom:9px;
+}
+.home-brand .b-bottom{
+  display:block;
+  font-family:"Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;
+  font-weight:300;
+  font-size:22px;
+  line-height:1.2;
+  letter-spacing:.005em;
+  color:var(--ink-low);
+}
+
+/* 模式列表 */
+.modes{
+  display:grid;
+  gap:0;
+  border-top:1px solid var(--line);
+}
+.mode{
+  display:grid;
+  grid-template-columns:44px 1fr 24px;
+  align-items:center;
+  gap:18px;
+  padding:24px 4px;
+  border:0;
+  border-bottom:1px solid var(--line);
+  background:transparent;
+  cursor:pointer;
+  text-align:left;
+  font:inherit;
+  color:var(--ink);
+  width:100%;
+  transition:padding-left .22s var(--ease);
+}
+.mode:hover{padding-left:14px;}
+.mode:hover .mode-arrow{transform:translateX(4px);color:var(--red);}
+.mode-num{font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--red);}
+.mode-title{display:block;font-size:19px;font-weight:800;letter-spacing:-.015em;margin-bottom:4px;}
+.mode-desc{display:block;font-size:13px;color:var(--muted);line-height:1.55;}
+.mode-arrow{
+  font-size:18px;color:var(--ink-faint);text-align:right;
+  transition:transform .28s var(--ease),color .22s var(--ease);
+}
+
+.hint{
+  margin-top:40px;
+  font-size:13px;
+  line-height:1.95;
+  color:var(--ink-mid);
+}
+.hint b{color:var(--ink);font-weight:700;}
+
+/* ================= 二级页 masthead ================= */
+.masthead{
+  position:relative;
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:16px;
+  padding-bottom:18px;
+  margin-bottom:36px;
+}
+.masthead::after{
+  content:"";
+  position:absolute;
+  left:0;right:0;bottom:0;
+  height:1.5px;
+  background:var(--ink);
+  transform:scaleX(0);
+  transform-origin:left center;
+  animation:lineIn .48s var(--ease) .06s forwards;
+}
+@keyframes lineIn{
+  from{transform:scaleX(0);}
+  to{transform:scaleX(1);}
+}
+.brand{
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+}
+.step{
+  font-size:10.5px;
+  letter-spacing:.18em;
+  color:var(--muted);
+  font-weight:700;
+  white-space:nowrap;
+  text-transform:uppercase;
+}
+
+/* ================= 通用文字 ================= */
+.eyebrow{
+  font-size:10px;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--red);margin-bottom:14px;
+}
+.page-title{
+  font-size:34px;font-weight:800;
+  line-height:1.14;letter-spacing:-.025em;
+  margin-bottom:16px;
+}
+.lede{
+  font-size:14px;line-height:1.9;
+  color:var(--ink-mid);
+  margin-bottom:32px;
+  max-width:40em;
+}
+.qtext{
+  font-size:24px;font-weight:700;
+  line-height:1.4;letter-spacing:-.015em;
+  margin-bottom:28px;
+}
+
+/* ================= 表单 ================= */
+.field{display:block;margin-bottom:20px;}
+.field-label{
+  display:block;font-size:10px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.field input{
+  width:100%;border:0;
+  border-bottom:1.5px solid var(--ink);
+  background:transparent;
+  padding:11px 0;
+  font-size:19px;font-weight:600;
+  font-family:inherit;color:var(--ink);
+  outline:none;
+  transition:border-color .22s var(--ease);
+}
+.field input:focus{border-color:var(--red);}
+
+/* ================= 按钮 ================= */
+.btn{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;width:100%;
+  padding:17px 20px;
+  border:1.5px solid var(--ink);
+  background:var(--ink);color:var(--btn-fg);
+  font:inherit;font-size:14.5px;font-weight:700;
+  letter-spacing:.05em;cursor:pointer;
+  transition:background-color .22s var(--ease),border-color .22s var(--ease),color .22s var(--ease),transform .1s var(--ease);
+}
+.btn .ic{font-size:15px;transition:transform .28s var(--ease);flex-shrink:0;}
+.btn:hover{background:var(--red);border-color:var(--red);color:#fff;}
+.btn:hover .ic{transform:translateX(4px);}
+.btn:active{transform:scale(.985);}
+.btn.ghost{background:transparent;color:var(--ink);}
+.btn.ghost:hover{background:var(--ink);color:var(--btn-fg);border-color:var(--ink);}
+.btn.ghost:hover .ic{transform:none;}
+.btn+.btn{margin-top:10px;}
+
+.btn-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+.btn-row .btn{margin-top:0;}
+
+/* ================= 选项 ================= */
+.options{border-top:1px solid var(--line);}
+.opt{
+  position:relative;
+  display:grid;grid-template-columns:36px 1fr 20px;
+  align-items:center;
+  width:100%;padding:17px 6px;
+  border:0;border-bottom:1px solid var(--line);
+  background:transparent;
+  font:inherit;color:var(--ink);text-align:left;
+  cursor:pointer;
+  transition:color .18s var(--ease),padding-left .22s var(--ease);
+}
+.opt::before{
+  content:"";position:absolute;left:-6px;right:-6px;top:0;bottom:0;
+  background:var(--overlay);opacity:0;
+  transition:opacity .2s var(--ease);pointer-events:none;
+}
+.opt>*{position:relative;z-index:1;}
+.opt .num{font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--muted);}
+.opt .txt{font-size:15.5px;font-weight:600;}
+.opt .arrow{
+  font-size:14px;color:var(--red);
+  opacity:0;transform:translateX(-6px);
+  transition:opacity .2s var(--ease),transform .24s var(--ease);
+}
+.opt:hover::before{opacity:1;}
+.opt:hover{padding-left:12px;}
+.opt:hover .arrow{opacity:1;transform:translateX(0);}
+.opt.picked{color:var(--red);}
+.opt.picked::before{opacity:1;background:var(--overlay-accent);}
+.opt.picked .num{color:var(--red);}
+.opt.picked .arrow{opacity:1;transform:translateX(0);}
+
+/* ================= 进度条 ================= */
+.progress{height:2px;background:var(--line);margin-bottom:26px;overflow:hidden;}
+.progress i{
+  display:block;height:100%;background:var(--red);
+  transform-origin:left center;transform:scaleX(0);
+  will-change:transform;
+}
+.p-head{
+  display:flex;justify-content:space-between;
+  font-size:10px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:12px;
+}
+.p-head b{color:var(--ink);}
+
+/* ================= 码框 ================= */
+.codebox{
+  width:100%;height:82px;
+  padding:14px;
+  border:1.5px solid var(--line);
+  background:var(--surface);
+  font-family:ui-monospace,Menlo,Consolas,monospace;
+  font-size:12px;line-height:1.65;
+  color:var(--text-body);resize:none;outline:none;
+  word-break:break-all;
+  transition:border-color .22s var(--ease),background-color .28s var(--ease),color .28s var(--ease);
+}
+.codebox:focus{border-color:var(--red);}
+
+/* ================= 文件导入 ================= */
+.import-or{
+  display:flex;align-items:center;gap:12px;
+  margin:16px 0;color:var(--muted);
+  font-size:10px;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;
+}
+.import-or::before,.import-or::after{content:"";flex:1;height:1px;background:var(--line);}
+.file-btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:16px;
+  border:1.5px dashed var(--line);
+  background:var(--surface-soft);
+  color:var(--ink-mid);
+  font:inherit;font-size:13.5px;font-weight:600;
+  cursor:pointer;
+  transition:border-color .22s var(--ease),background-color .22s var(--ease),color .22s var(--ease);
+}
+.file-btn:hover{border-color:var(--ink);color:var(--ink);background:var(--surface-hover);}
+.file-btn .ic{font-size:14px;color:var(--red);}
+
+/* ================= 分数 ================= */
+.score-num{
+  display:flex;align-items:baseline;gap:4px;
+  font-size:88px;font-weight:800;line-height:1;
+  letter-spacing:-.045em;margin-bottom:22px;
+}
+.score-num small{font-size:28px;font-weight:700;color:var(--red);}
+.score-bar{height:8px;background:var(--line);overflow:hidden;margin-bottom:14px;}
+.score-bar i{
+  display:block;height:100%;background:var(--red);
+  transform-origin:left center;transform:scaleX(0);
+  will-change:transform;
+}
+.score-meta{
+  display:flex;justify-content:space-between;
+  font-size:11px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:32px;
+}
+.score-meta b{color:var(--ink);}
+
+/* ================= 对比 ================= */
+.cmp{border-top:1px solid var(--line);}
+.cmp-row{padding:15px 0;border-bottom:1px solid var(--line);}
+.cmp-row:last-child{border-bottom:0;}
+.cmp-head{
+  display:grid;grid-template-columns:30px 1fr 18px;
+  gap:10px;align-items:baseline;margin-bottom:9px;
+}
+.cmp-num{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--ink-faint);}
+.cmp-q{font-size:13.5px;line-height:1.55;color:var(--text-strong);font-weight:600;}
+.cmp-mark{font-size:13px;font-weight:800;text-align:right;}
+.cmp-row.ok .cmp-mark{color:var(--red);}
+.cmp-row.no .cmp-mark{color:var(--ink-faint);}
+.cmp-ans{display:flex;flex-wrap:wrap;gap:7px;padding-left:40px;}
+.tag{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 9px;font-size:11.5px;font-weight:600;
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--text-tag);
+}
+.tag em{
+  font-style:normal;font-size:9px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--tag-label);
+}
+.cmp-row.ok .tag{border-color:rgba(227,6,19,.3);background:var(--overlay-accent);color:var(--red-deep);}
+.cmp-row.ok .tag em{color:var(--red-soft);}
+
+/* ================= 回顾 ================= */
+.review-row{
+  display:grid;grid-template-columns:30px 1fr auto;
+  gap:10px;align-items:baseline;
+  padding:12px 0;border-bottom:1px solid var(--line);
+  font-size:13px;
+}
+.review-row:last-child{border-bottom:0;}
+.review-num{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--ink-faint);}
+.review-q{color:var(--text-body);line-height:1.55;}
+.review-a{font-weight:700;}
+
+/* ================= Toast ================= */
+#toast{
+  position:fixed;left:50%;bottom:36px;
+  transform:translate(-50%,20px);
+  background:var(--toast-bg);color:var(--toast-fg);
+  font-size:13px;font-weight:600;letter-spacing:.04em;
+  padding:12px 22px;opacity:0;pointer-events:none;
+  transition:opacity .24s var(--ease),transform .24s var(--ease),background-color .28s var(--ease),color .28s var(--ease);
+  z-index:9999;max-width:82%;text-align:center;
+  white-space:pre-line;
+}
+#toast.show{opacity:1;transform:translate(-50%,0);}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-delay:0ms !important;
+    transition-duration:.001ms !important;
+  }
+}
+
+/* ================= 桌面端 ================= */
+@media (min-width:900px){
+  #app{max-width:1100px;padding:56px 56px 120px;}
+
+  .theme-toggle{top:28px;right:32px;padding:9px 16px;font-size:11px;}
+
+  /* 首页左右两栏 */
+  .home{
+    grid-template-columns:1.05fr 1fr;
+    gap:80px;
+    align-items:start;
+    min-height:calc(100vh - 220px);
+  }
+  .home-left{
+    position:sticky;
+    top:56px;
+  }
+  .home-title{font-size:80px;letter-spacing:-.04em;margin-bottom:38px;}
+  .home-title .t-thin{margin-bottom:6px;}
+  .home-brand{padding-left:4px;}
+  .home-brand .b-top{font-size:15px;letter-spacing:.32em;margin-bottom:12px;}
+  .home-brand .b-bottom{font-size:30px;letter-spacing:.01em;}
+
+  .mode{grid-template-columns:56px 1fr 30px;padding:30px 4px;gap:24px;}
+  .mode:hover{padding-left:18px;}
+  .mode-num{font-size:12px;}
+  .mode-title{font-size:22px;}
+  .mode-desc{font-size:14px;}
+  .mode-arrow{font-size:20px;}
+  .hint{margin-top:52px;font-size:14px;}
+
+  /* 二级页面 */
+  .masthead{padding-bottom:22px;margin-bottom:48px;}
+  .brand{font-size:12px;}
+  .step{font-size:11.5px;}
+  .page-title{font-size:46px;}
+  .lede{font-size:15px;margin-bottom:40px;}
+  .qtext{font-size:30px;margin-bottom:36px;}
+  .field input{font-size:21px;padding:13px 0;}
+  .btn{padding:20px 26px;font-size:15px;}
+  .btn .ic{font-size:16px;}
+  .opt{grid-template-columns:46px 1fr 24px;padding:22px 10px;}
+  .opt .txt{font-size:17px;}
+  .opt:hover{padding-left:20px;}
+  .codebox{height:92px;font-size:13px;padding:18px 16px;}
+  .score-num{font-size:128px;margin-bottom:28px;}
+  .score-num small{font-size:40px;}
+  .score-bar{height:10px;}
+  .cmp-row{padding:19px 0;}
+  .cmp-head{grid-template-columns:36px 1fr 22px;gap:12px;margin-bottom:11px;}
+  .cmp-q{font-size:15px;}
+  .cmp-ans{padding-left:48px;gap:9px;}
+  .tag{font-size:12.5px;padding:5px 11px;}
+  .review-row{padding:14px 0;font-size:14px;}
+
+  .masthead,.page-body{max-width:760px;}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<button class="theme-toggle" id="themeToggle" type="button" aria-label="切换主题">DARK</button>
+<script>
+(function(){
+'use strict';
+
+/* ============================================================
+   题库
+   ============================================================ */
+var QUESTIONS = [
+  { q:'{who}最喜欢的季节是？',          options:['春天','夏天','秋天','冬天'] },
+  { q:'周末{who}更想做什么？',          options:['宅家躺平','出门逛逛','睡到自然醒','运动出汗'] },
+  { q:'吃火锅{who}必点的是？',          options:['毛肚','肥牛','虾滑','土豆'] },
+  { q:'{who}更喜欢哪种小动物？',        options:['猫','狗','都喜欢','都不喜欢'] },
+  { q:'{who}起床后第一件事是？',        options:['看手机','喝水','洗漱','继续赖床'] },
+  { q:'{who}更想去哪里旅行？',          options:['海边','爬山','繁华都市','古镇小城'] },
+  { q:'{who}喝奶茶一般选几分糖？',      options:['全糖','七分糖','半糖','无糖'] },
+  { q:'{who}更爱看哪种电影？',          options:['喜剧','悬疑','爱情','科幻'] },
+  { q:'手机电量低于多少{who}会焦虑？',  options:['50%','30%','20%','10%'] },
+  { q:'{who}心情不好时更想？',          options:['一个人静静','找人倾诉','吃顿好的','睡一觉'] }
+];
+var TOTAL = QUESTIONS.length;
+
+var QHASH = (function(){
+  var str = JSON.stringify(QUESTIONS);
+  var h = 5381;
+  for (var i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36).slice(0, 5);
+})();
+
+/* ============================================================
+   加密
+   ============================================================ */
+var SECRET = 'SimianTies::2024::Key::v1';
+var SEP = '\u0001';
+
+function xorBytes(bytes, key){
+  var out = new Uint8Array(bytes.length);
+  for (var i = 0; i < bytes.length; i++) out[i] = bytes[i] ^ key.charCodeAt(i % key.length);
+  return out;
+}
+function toBin(bytes){
+  var s = '';
+  for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+  return s;
+}
+function encrypt(str){
+  var bytes = new TextEncoder().encode(str);
+  var enc = xorBytes(bytes, SECRET);
+  return btoa(toBin(enc)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function decrypt(b64){
+  b64 = b64.replace(/-/g,'+').replace(/_/g,'/');
+  while (b64.length % 4) b64 += '=';
+  var bin = atob(b64);
+  var bytes = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  var dec = xorBytes(bytes, SECRET);
+  return new TextDecoder().decode(dec);
+}
+
+function buildQuizCode(){
+  return 'M1' + encrypt(QHASH + SEP + state.name + SEP + state.answers.join(''));
+}
+function buildAnswerCode(){
+  return 'M2' + encrypt([
+    QHASH,
+    state.cfg.c,
+    state.cfg.a.join(''),
+    state.name,
+    state.answers.join('')
+  ].join(SEP));
+}
+
+function parseAnsStr(s, total){
+  if (!s || s.length !== total) return null;
+  var out = [];
+  for (var i = 0; i < total; i++){
+    var c = s.charCodeAt(i) - 48;
+    if (c < 0 || c > 9) return null;
+    if (c >= QUESTIONS[i].options.length) return null;
+    out.push(c);
+  }
+  return out;
+}
+
+function parseQuizCode(raw){
+  var str = String(raw || '').replace(/\s+/g, '');
+  if (!str) return { err:'请先粘贴题目码' };
+  if (str.slice(0,2) !== 'M1') return { err:'这不是题目码，应以 M1 开头' };
+  try{
+    var payload = decrypt(str.slice(2));
+    var parts = payload.split(SEP);
+    if (parts.length !== 3) return { err:'题目码内容不完整' };
+    if (parts[0] !== QHASH) return { err:'题目码与当前题库版本不一致' };
+    var name = (parts[1] || '').trim() || '对方';
+    var answers = parseAnsStr(parts[2], TOTAL);
+    if (!answers) return { err:'题目码答案部分无法解析' };
+    return { q: QUESTIONS, c: name, a: answers };
+  }catch(e){
+    return { err:'题目码解密失败，请确认码是否完整' };
+  }
+}
+
+function parseAnswerCode(raw){
+  var str = String(raw || '').replace(/\s+/g, '');
+  if (!str) return { err:'请先粘贴答卷码' };
+  if (str.slice(0,2) !== 'M2') return { err:'这不是答卷码，应以 M2 开头' };
+  try{
+    var payload = decrypt(str.slice(2));
+    var parts = payload.split(SEP);
+    if (parts.length !== 5) return { err:'答卷码内容不完整' };
+    if (parts[0] !== QHASH) return { err:'答卷码与当前题库版本不一致' };
+    var creatorAns = parseAnsStr(parts[2], TOTAL);
+    var playerAns  = parseAnsStr(parts[4], TOTAL);
+    if (!creatorAns || !playerAns) return { err:'答卷码答案部分无法解析' };
+    return {
+      q: QUESTIONS,
+      c: (parts[1] || '').trim() || '出题人',
+      a: creatorAns,
+      p: (parts[3] || '').trim() || '答题人',
+      g: playerAns
+    };
+  }catch(e){
+    return { err:'答卷码解密失败，请确认码是否完整' };
+  }
+}
+
+/* ============================================================
+   状态
+   ============================================================ */
+var state = {
+  view: 'home',
+  step: '',
+  name: '',
+  idx: 0,
+  answers: [],
+  cfg: null
+};
+var busy = false;
+var lastProgress = 0;
+var app = document.getElementById('app');
+
+/* ============================================================
+   主题切换
+   ============================================================ */
+function applyTheme(theme){
+  if (theme === 'dark'){
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
+  var btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = theme === 'dark' ? 'LIGHT' : 'DARK';
+  try{ localStorage.setItem('sta-theme', theme); }catch(e){}
+}
+
+function toggleTheme(){
+  var cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  applyTheme(cur === 'dark' ? 'light' : 'dark');
+}
+
+/* ============================================================
+   工具
+   ============================================================ */
+function esc(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function pad(n){ return n<10?'0'+n:''+n; }
+
+var toastEl = null;
+var toastTimer = null;
+function toast(msg){
+  if (!toastEl){
+    toastEl = document.createElement('div');
+    toastEl.id = 'toast';
+    document.body.appendChild(toastEl);
+  }
+  toastEl.textContent = msg;
+  toastEl.classList.remove('show');
+  void toastEl.offsetWidth;
+  requestAnimationFrame(function(){
+    toastEl.classList.add('show');
+  });
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){
+    toastEl.classList.remove('show');
+  }, 2200);
+}
+
+function copy(text, okMsg){
+  function fb(){
+    try{
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.top = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      toast(okMsg);
+    }catch(e){ toast('复制失败，请手动全选复制'); }
+  }
+  if (navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(function(){ toast(okMsg); }).catch(fb);
+  } else fb();
+}
+
+function pasteFromClipboard(cb){
+  if (navigator.clipboard && navigator.clipboard.readText){
+    navigator.clipboard.readText().then(function(text){
+      cb(String(text || '').trim());
+    }).catch(function(){
+      toast('浏览器不允许读取剪贴板\n请手动长按输入框粘贴');
+    });
+  } else {
+    toast('当前浏览器不支持一键粘贴\n请手动长按输入框粘贴');
+  }
+}
+
+/* ============================================================
+   页面切换
+   ============================================================ */
+function goHome(){
+  state.view = 'home';
+  state.step = '';
+  state.cfg = null;
+  state.name = '';
+  state.answers = [];
+  state.idx = 0;
+  lastProgress = 0;
+  render();
+}
+
+function openView(v){
+  state.view = v;
+  state.step = '';
+  state.cfg = null;
+  state.name = '';
+  state.answers = [];
+  state.idx = 0;
+  lastProgress = 0;
+  if (v === 'create') state.step = 'name';
+  if (v === 'join')   state.step = 'input';
+  if (v === 'view')   state.step = 'input';
+  render();
+}
+
+/* ============================================================
+   渲染
+   ============================================================ */
+function render(){
+  try{
+    if (state.view === 'home'){
+      app.innerHTML = renderHome();
+    } else {
+      app.innerHTML = renderPage();
+    }
+  }catch(err){
+    app.innerHTML = '<p style="padding:24px;color:#e30613;font-family:monospace;">渲染出错：' + esc(err.message) + '</p>';
+    return;
+  }
+
+  bindAll();
+
+  requestAnimationFrame(afterRender);
+}
+
+/* ============================================================
+   事件绑定
+   ============================================================ */
+function bindAll(){
+  var modes = app.querySelectorAll('.mode[data-view]');
+  for (var i = 0; i < modes.length; i++){
+    (function(el){
+      el.onclick = function(ev){
+        ev.preventDefault();
+        openView(el.getAttribute('data-view'));
+      };
+    })(modes[i]);
+  }
+
+  var opts = app.querySelectorAll('.opt[data-i]');
+  for (var j = 0; j < opts.length; j++){
+    (function(el){
+      el.onclick = function(ev){
+        ev.preventDefault();
+        if (busy) return;
+        handlePick(+el.getAttribute('data-i'), el);
+      };
+    })(opts[j]);
+  }
+
+  var btns = app.querySelectorAll('[data-action]');
+  for (var k = 0; k < btns.length; k++){
+    (function(el){
+      el.onclick = function(ev){
+        ev.preventDefault();
+        var action = el.getAttribute('data-action');
+        try{
+          handleAction(action);
+        }catch(err){
+          toast('操作出错：' + err.message);
+        }
+      };
+    })(btns[k]);
+  }
+
+  var files = app.querySelectorAll('input[type=file]');
+  for (var n = 0; n < files.length; n++){
+    (function(el){
+      el.onchange = function(){
+        var f = el.files && el.files[0];
+        if (!f) return;
+        var reader = new FileReader();
+        reader.onload = function(){
+          var ta = app.querySelector('.codebox');
+          if (ta){
+            ta.value = String(reader.result || '').trim();
+            toast('已读入文件\n点上方按钮继续');
+          }
+        };
+        reader.onerror = function(){ toast('文件读取失败'); };
+        reader.readAsText(f);
+        el.value = '';
+      };
+    })(files[n]);
+  }
+}
+
+/* ============================================================
+   首页
+   ============================================================ */
+function renderHome(){
+  return '' +
+    '<div class="home">' +
+      '<div class="home-left">' +
+        '<h1 class="home-title">' +
+          '<span class="t-thin">你好，</span>' +
+          '<span class="t-thick">想玩哪一种？</span>' +
+        '</h1>' +
+        '<div class="home-brand">' +
+          '<span class="b-top">SIMIAN TIES</span>' +
+          '<span class="b-bottom">Among Relatives</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="home-right">' +
+        '<div class="modes">' +
+          modeCard(1, '出题', '设置自己的答案，生成一段题目码发给对方', 'create') +
+          modeCard(2, '答题', '粘贴对方发来的题目码，猜猜 TA 会怎么选', 'join') +
+          modeCard(3, '看结果', '粘贴答题人发回的答卷码，查看你们的默契度', 'view') +
+        '</div>' +
+        '<p class="hint">' +
+          '<b>出题人</b> → 生成题目码 → 微信发给对方<br>' +
+          '<b>答题人</b> → 粘贴题目码 → 逐题作答 → 生成答卷码 → 发回<br>' +
+          '<b>出题人</b> → 粘贴答卷码 → 立刻看到默契度' +
+        '</p>' +
+      '</div>' +
+    '</div>';
+}
+function modeCard(n, title, desc, view){
+  return '<button class="mode" data-view="' + view + '" type="button">' +
+    '<span class="mode-num">' + pad(n) + '</span>' +
+    '<span><span class="mode-title">' + title + '</span>' +
+    '<span class="mode-desc">' + desc + '</span></span>' +
+    '<span class="mode-arrow">→</span>' +
+  '</button>';
+}
+
+/* ============================================================
+   二级页面
+   ============================================================ */
+function renderPage(){
+  var html = '' +
+    '<header class="masthead">' +
+      '<span class="brand">Simian Ties</span>' +
+      '<span class="step">' + esc(getStepLabel()) + '</span>' +
+    '</header>' +
+    '<main class="page-body">';
+
+  var v = state.view, s = state.step;
+
+  if (v === 'create'){
+    if (s === 'name')        html += viewCreateName();
+    else if (s === 'answer') html += viewAnswer(true);
+    else if (s === 'done')   html += viewCreateDone();
+  } else if (v === 'join'){
+    if (s === 'input')       html += viewJoinInput();
+    else if (s === 'name')   html += viewJoinName();
+    else if (s === 'answer') html += viewAnswer(false);
+    else if (s === 'done')   html += viewJoinDone();
+  } else if (v === 'view'){
+    if (s === 'input')       html += viewViewInput();
+    else if (s === 'result') html += viewResult();
+  }
+
+  html += '</main>';
+  return html;
+}
+
+function getStepLabel(){
+  var v = state.view, s = state.step;
+  if (v === 'create'){
+    if (s === 'name') return 'Step 01 / 03';
+    if (s === 'answer') return 'Step 02 / 03';
+    if (s === 'done') return 'Step 03 / 03';
+  }
+  if (v === 'join'){
+    if (s === 'input') return 'Step 01 / 04';
+    if (s === 'name') return 'Step 02 / 04';
+    if (s === 'answer') return 'Step 03 / 04';
+    if (s === 'done') return 'Step 04 / 04';
+  }
+  if (v === 'view'){
+    if (s === 'input') return 'Step 01 / 02';
+    if (s === 'result') return 'Step 02 / 02';
+  }
+  return '';
+}
+
+/* ---------- 出题 ---------- */
+function viewCreateName(){
+  return '' +
+    '<p class="eyebrow">出题</p>' +
+    '<h2 class="page-title">先写下你的答案</h2>' +
+    '<p class="lede">设置好你自己的选择，生成一段题目码发给对方。对方答完把答卷码发回，你粘贴就能看到默契度。</p>' +
+    '<label class="field"><span class="field-label">你的名字</span>' +
+      '<input id="myName" maxlength="8" placeholder="例如：小 A" value="' + esc(state.name) + '" autocomplete="off">' +
+    '</label>' +
+    '<button class="btn" data-action="create-start" type="button">开始设置答案 <span class="ic">→</span></button>' +
+    '<button class="btn ghost" data-action="home" type="button" style="margin-top:10px">← 返回首页</button>';
+}
+
+function viewCreateDone(){
+  var code = buildQuizCode();
+  var rows = QUESTIONS.map(function(q, i){
+    return '<div class="review-row">' +
+      '<span class="review-num">' + pad(i+1) + '</span>' +
+      '<span class="review-q">' + esc(q.q.replace('{who}','你')) + '</span>' +
+      '<span class="review-a">' + esc(q.options[state.answers[i]]) + '</span>' +
+    '</div>';
+  }).join('');
+
+  return '' +
+    '<p class="eyebrow">题目码已生成</p>' +
+    '<h2 class="page-title">复制发给对方</h2>' +
+    '<p class="lede">把下面这段短码整段复制，微信 / QQ 发给对方。对方选「答题」粘贴就能开始。</p>' +
+    '<textarea class="codebox" readonly>' + esc(code) + '</textarea>' +
+    '<div class="btn-row">' +
+      '<button class="btn" data-action="copy-code" type="button">复制题目码 <span class="ic">⧉</span></button>' +
+      '<button class="btn ghost" data-action="home" type="button">← 返回</button>' +
+    '</div>' +
+    '<p class="eyebrow" style="margin-top:36px">你的答案</p>' +
+    '<div>' + rows + '</div>';
+}
+
+/* ---------- 答题 ---------- */
+function viewJoinInput(){
+  return '' +
+    '<p class="eyebrow">答题</p>' +
+    '<h2 class="page-title">粘贴题目码</h2>' +
+    '<p class="lede">把出题人发给你的那整段短码，粘贴到下面的输入框里。也可以从文件导入。</p>' +
+    '<textarea class="codebox" id="codeInput" placeholder="在这里粘贴题目码（以 M1 开头）…"></textarea>' +
+    '<div class="btn-row">' +
+      '<button class="btn ghost" data-action="paste-clipboard" type="button">一键粘贴 <span class="ic">⧉</span></button>' +
+      '<button class="btn" data-action="join-parse" type="button">解析题目码 <span class="ic">→</span></button>' +
+    '</div>' +
+    '<div class="import-or">或</div>' +
+    '<label class="file-btn" for="fileInput"><span class="ic">↑</span><span>从文件导入（.txt / .json）</span></label>' +
+    '<input type="file" id="fileInput" accept=".txt,.json,.html,text/plain" style="display:none">' +
+    '<button class="btn ghost" data-action="home" type="button" style="margin-top:14px">← 返回首页</button>';
+}
+
+function viewJoinName(){
+  return '' +
+    '<p class="eyebrow">答题</p>' +
+    '<h2 class="page-title">' + esc(state.cfg.c) + ' 出了一道题</h2>' +
+    '<p class="lede">共 ' + state.cfg.q.length + ' 道题。猜猜 TA 会怎么选，答完后会生成一段答卷码，发回给出题人即可。</p>' +
+    '<label class="field"><span class="field-label">你的名字</span>' +
+      '<input id="myName" maxlength="8" placeholder="例如：小 B" value="' + esc(state.name) + '" autocomplete="off">' +
+    '</label>' +
+    '<button class="btn" data-action="join-start" type="button">开始答题 <span class="ic">→</span></button>' +
+    '<button class="btn ghost" data-action="home" type="button" style="margin-top:10px">← 返回首页</button>';
+}
+
+function viewJoinDone(){
+  var code = buildAnswerCode();
+  return '' +
+    '<p class="eyebrow">答卷码已生成</p>' +
+    '<h2 class="page-title">复制发回给 TA</h2>' +
+    '<p class="lede">把下面这段短码整段复制发回给 ' + esc(state.cfg.c) + '。TA 打开程序选「看结果」，粘贴就能看到默契度。</p>' +
+    '<textarea class="codebox" readonly>' + esc(code) + '</textarea>' +
+    '<div class="btn-row">' +
+      '<button class="btn" data-action="copy-code" type="button">复制答卷码 <span class="ic">⧉</span></button>' +
+      '<button class="btn ghost" data-action="home" type="button">← 返回</button>' +
+    '</div>';
+}
+
+/* ---------- 作答 ---------- */
+function viewAnswer(isCreate){
+  var qs = isCreate ? QUESTIONS : state.cfg.q;
+  var q = qs[state.idx];
+  var who = isCreate ? '你' : state.cfg.c;
+  var eyebrow = isCreate ? '设置你的答案' : '猜 ' + esc(state.cfg.c) + ' 会怎么选';
+
+  return '' +
+    '<div class="p-head"><span>' + eyebrow + '</span>' +
+      '<span><b>' + pad(state.idx+1) + '</b> / ' + pad(TOTAL) + '</span></div>' +
+    progressBar(state.idx / TOTAL) +
+    '<h2 class="qtext">' + esc(q.q.replace('{who}', who)) + '</h2>' +
+    '<div class="options">' +
+      q.options.map(function(o, i){
+        return '<button class="opt" data-i="' + i + '" type="button">' +
+          '<span class="num">' + pad(i+1) + '</span>' +
+          '<span class="txt">' + esc(o) + '</span>' +
+          '<span class="arrow">→</span>' +
+        '</button>';
+      }).join('') +
+    '</div>';
+}
+
+/* ---------- 看结果 ---------- */
+function viewViewInput(){
+  return '' +
+    '<p class="eyebrow">看结果</p>' +
+    '<h2 class="page-title">粘贴答卷码</h2>' +
+    '<p class="lede">把答题人发回来的那整段短码，粘贴到下面的输入框里。也可以从文件导入。</p>' +
+    '<textarea class="codebox" id="codeInput" placeholder="在这里粘贴答卷码（以 M2 开头）…"></textarea>' +
+    '<div class="btn-row">' +
+      '<button class="btn ghost" data-action="paste-clipboard" type="button">一键粘贴 <span class="ic">⧉</span></button>' +
+      '<button class="btn" data-action="view-parse" type="button">查看默契度 <span class="ic">→</span></button>' +
+    '</div>' +
+    '<div class="import-or">或</div>' +
+    '<label class="file-btn" for="fileInput2"><span class="ic">↑</span><span>从文件导入（.txt / .json）</span></label>' +
+    '<input type="file" id="fileInput2" accept=".txt,.json,.html,text/plain" style="display:none">' +
+    '<button class="btn ghost" data-action="home" type="button" style="margin-top:14px">← 返回首页</button>';
+}
+
+function viewResult(){
+  var cfg = state.cfg;
+  var total = cfg.q.length;
+  var same = 0;
+  for (var i = 0; i < total; i++) if (cfg.a[i] === cfg.g[i]) same++;
+  var score = Math.round(same / total * 100);
+  var c = comment(score);
+
+  var rows = cfg.q.map(function(q, i){
+    var ok = cfg.a[i] === cfg.g[i];
+    return '<div class="cmp-row ' + (ok ? 'ok' : 'no') + '">' +
+      '<div class="cmp-head">' +
+        '<span class="cmp-num">' + pad(i+1) + '</span>' +
+        '<span class="cmp-q">' + esc(q.q.replace('{who}', cfg.c)) + '</span>' +
+        '<span class="cmp-mark">' + (ok ? '✓' : '✗') + '</span>' +
+      '</div>' +
+      '<div class="cmp-ans">' +
+        '<span class="tag"><em>出题</em>' + esc(q.options[cfg.a[i]]) + '</span>' +
+        '<span class="tag"><em>猜测</em>' + esc(q.options[cfg.g[i]]) + '</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  return '' +
+    '<p class="eyebrow">默契度</p>' +
+    '<div class="score-num"><span id="scoreNum" data-target="' + score + '">0</span><small>%</small></div>' +
+    '<div class="score-bar"><i data-bar="' + (score/100).toFixed(4) + '"></i></div>' +
+    '<div class="score-meta">' +
+      '<span><b>' + same + '</b> / ' + total + ' 题一致</span>' +
+      '<span>' + esc(cfg.c) + ' × ' + esc(cfg.p) + '</span>' +
+    '</div>' +
+    '<h2 class="page-title" style="margin-bottom:12px">' + c.t + '</h2>' +
+    '<p class="lede">' + c.d + '</p>' +
+    '<p class="eyebrow" style="margin-top:8px">逐题对照</p>' +
+    '<div class="cmp">' + rows + '</div>' +
+    '<button class="btn ghost" data-action="home" type="button" style="margin-top:26px">← 回到首页</button>';
+}
+
+function comment(s){
+  if (s === 100) return {t:'心有灵犀', d:'满分默契。你们几乎不需要说话，就能懂对方在想什么。'};
+  if (s >= 80)   return {t:'默契爆表', d:'十个选择里八九个一致，这种了解程度相当少见。'};
+  if (s >= 60)   return {t:'相当合拍', d:'大方向高度一致，剩下的小分歧正好留给下次聊天。'};
+  if (s >= 40)   return {t:'还需磨合', d:'一半左右能对上。多聊聊天，默契是可以练出来的。'};
+  if (s >= 20)   return {t:'两个世界', d:'你们的选择差异明显 —— 也许正因为这样才互补。'};
+  return            {t:'完全相反', d:'一个选东，一个选西。这也是一种难得的缘分。'};
+}
+
+/* ============================================================
+   动画
+   ============================================================ */
+function progressBar(r){
+  if (r === 0) lastProgress = 0;
+  return '<div class="progress"><i data-bar="' + r.toFixed(4) + '"></i></div>';
+}
+
+function afterRender(){
+  var bar = app.querySelector('.progress i');
+  if (bar){
+    var target = parseFloat(bar.getAttribute('data-bar')) || 0;
+    bar.style.transition = 'none';
+    bar.style.transform  = 'scaleX(' + lastProgress + ')';
+    void bar.offsetHeight;
+    bar.style.transition = 'transform .55s cubic-bezier(.22,.72,.28,1)';
+    bar.style.transform  = 'scaleX(' + target + ')';
+    lastProgress = target;
+  }
+  var sbar = app.querySelector('.score-bar i');
+  if (sbar){
+    var st = parseFloat(sbar.getAttribute('data-bar')) || 0;
+    requestAnimationFrame(function(){ sbar.style.transform = 'scaleX(' + st + ')'; });
+  }
+  var n = document.getElementById('scoreNum');
+  if (n) setTimeout(function(){ countUp(n, +n.getAttribute('data-target'), 800); }, 140);
+}
+
+function countUp(el, target, dur){
+  var t0 = performance.now();
+  (function tick(now){
+    var p = Math.min(1, (now - t0) / dur);
+    var eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(target * eased);
+    if (p < 1) requestAnimationFrame(tick);
+    else el.textContent = target;
+  })(t0);
+}
+
+/* ============================================================
+   动作分发
+   ============================================================ */
+function handleAction(a){
+  if (a === 'home'){ goHome(); return; }
+
+  if (a === 'copy-code'){
+    var ta = app.querySelector('.codebox');
+    if (ta) copy(ta.value, '已复制\n粘贴发给对方即可');
+    return;
+  }
+
+  if (a === 'paste-clipboard'){
+    pasteFromClipboard(function(text){
+      var t = document.getElementById('codeInput');
+      if (t && text){ t.value = text; toast('已粘贴'); }
+      else if (!text) toast('剪贴板是空的');
+    });
+    return;
+  }
+
+  if (a === 'create-start'){
+    var input = document.getElementById('myName');
+    var n = (input ? input.value : '').trim();
+    if (!n){ toast('请先输入名字'); return; }
+    state.name = n.slice(0, 8);
+    state.idx = 0;
+    state.answers = [];
+    lastProgress = 0;
+    state.step = 'answer';
+    render();
+    return;
+  }
+
+  if (a === 'join-parse'){
+    var input2 = document.getElementById('codeInput');
+    if (!input2){ toast('找不到输入框，请刷新页面'); return; }
+    var raw = input2.value || '';
+    var res = parseQuizCode(raw);
+    if (res.err){ toast(res.err); return; }
+    state.cfg = res;
+    state.idx = 0;
+    state.answers = [];
+    state.name = '';
+    lastProgress = 0;
+    state.step = 'name';
+    render();
+    return;
+  }
+
+  if (a === 'join-start'){
+    var input3 = document.getElementById('myName');
+    var n2 = (input3 ? input3.value : '').trim();
+    if (!n2){ toast('请先输入名字'); return; }
+    state.name = n2.slice(0, 8);
+    state.idx = 0;
+    state.answers = [];
+    lastProgress = 0;
+    state.step = 'answer';
+    render();
+    return;
+  }
+
+  if (a === 'view-parse'){
+    var input4 = document.getElementById('codeInput');
+    if (!input4){ toast('找不到输入框，请刷新页面'); return; }
+    var raw2 = input4.value || '';
+    var res2 = parseAnswerCode(raw2);
+    if (res2.err){ toast(res2.err); return; }
+    state.cfg = res2;
+    state.step = 'result';
+    render();
+    return;
+  }
+
+  toast('未知操作：' + a);
+}
+
+function handlePick(i, btn){
+  if (busy) return;
+  busy = true;
+  btn.classList.add('picked');
+
+  setTimeout(function(){
+    state.answers[state.idx] = i;
+    state.idx++;
+
+    if (state.idx >= TOTAL){
+      state.step = 'done';
+    }
+    busy = false;
+    render();
+  }, 170);
+}
+
+/* ============================================================
+   启动
+   ============================================================ */
+render();
+
+(function initTheme(){
+  var saved = 'light';
+  try{ saved = localStorage.getItem('sta-theme') || 'light'; }catch(e){}
+  applyTheme(saved);
+  var btn = document.getElementById('themeToggle');
+  if (btn) btn.addEventListener('click', toggleTheme);
+})();
+
+})();
+</script>
+</body>
+</html>
