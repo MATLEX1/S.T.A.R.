@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>Simian Ties Among Relatives</title>
+<script>
+(function(){
+  try{
+    if (localStorage.getItem('sta-theme') === 'dark'){
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  }catch(e){}
+})();
+</script>
 <style>
 :root{
   --ink:#0a0a0a;
@@ -12,6 +21,47 @@
   --bg:#efece6;
   --red:#e30613;
   --ease:cubic-bezier(.22,.72,.28,1);
+  --surface: rgba(255,255,255,.35);
+  --surface-soft: rgba(255,255,255,.25);
+  --surface-hover: rgba(255,255,255,.55);
+  --overlay: rgba(10,10,10,.035);
+  --overlay-accent: rgba(227,6,19,.08);
+  --ink-low: #6b6760;
+  --ink-mid: #5e5a54;
+  --ink-faint: #c3bfb6;
+  --text-body: #666;
+  --text-strong: #3a3a3a;
+  --text-tag: #4a4a4a;
+  --tag-label: #b5b1a9;
+  --btn-fg: #ffffff;
+  --toast-bg: #0a0a0a;
+  --toast-fg: #ffffff;
+  --red-deep: #9d0a15;
+  --red-soft: #d98d94;
+}
+html[data-theme="dark"]{
+  --ink: #f0ede7;
+  --muted: #8a8680;
+  --line: rgba(240,237,231,.14);
+  --bg: #171614;
+  --surface: rgba(255,255,255,.06);
+  --surface-soft: rgba(255,255,255,.04);
+  --surface-hover: rgba(255,255,255,.10);
+  --overlay: rgba(255,255,255,.05);
+  --overlay-accent: rgba(227,6,19,.20);
+  --ink-low: #a9a49c;
+  --ink-mid: #b5b0a8;
+  --ink-faint: #57534d;
+  --text-body: #b5b0a8;
+  --text-strong: #d6d2cc;
+  --text-tag: #c9c5be;
+  --tag-label: #767066;
+  --btn-fg: #171614;
+  --toast-bg: #f0ede7;
+  --toast-fg: #171614;
+  --red-deep: #ff8a93;
+  --red-soft: #c96a74;
+  color-scheme: dark;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;}
@@ -23,22 +73,43 @@ body{
   font-variant-numeric:tabular-nums;
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
+  transition:background-color .28s var(--ease), color .28s var(--ease);
 }
 
 #app{
   width:100%;
   max-width:600px;
   margin:0 auto;
-  padding:36px 24px 88px;
+  padding:36px 24px 120px;
 }
+
+/* ================= 主题切换按钮 ================= */
+.theme-toggle{
+  position:fixed;
+  bottom:24px; right:20px;
+  z-index:100;
+  padding:8px 14px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--ink);
+  font:inherit;
+  font-size:10.5px;
+  font-weight:800;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  cursor:pointer;
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  transition:border-color .22s var(--ease),
+             background-color .22s var(--ease),
+             color .22s var(--ease),
+             transform .1s var(--ease);
+}
+.theme-toggle:hover{border-color:var(--ink);}
+.theme-toggle:active{transform:scale(.95);}
 
 /* ================= 首页 ================= */
-.home{
-  display:grid;
-  gap:44px;
-}
-
-/* 标题：两行统一超粗 */
+.home{display:grid;gap:44px;}
 .home-title{
   font-size:44px;
   line-height:1.02;
@@ -56,8 +127,6 @@ body{
   font-weight:900;
   letter-spacing:-.045em;
 }
-
-/* 英文：两行统一极细 */
 .home-brand{padding-left:2px;}
 .home-brand .b-top{
   display:block;
@@ -75,15 +144,10 @@ body{
   font-size:22px;
   line-height:1.2;
   letter-spacing:.005em;
-  color:#6b6760;
+  color:var(--ink-low);
 }
 
-/* 模式列表 */
-.modes{
-  display:grid;
-  gap:0;
-  border-top:1px solid var(--line);
-}
+.modes{display:grid;gap:0;border-top:1px solid var(--line);}
 .mode{
   display:grid;
   grid-template-columns:44px 1fr 24px;
@@ -106,7 +170,7 @@ body{
 .mode-title{display:block;font-size:19px;font-weight:800;letter-spacing:-.015em;margin-bottom:4px;}
 .mode-desc{display:block;font-size:13px;color:var(--muted);line-height:1.55;}
 .mode-arrow{
-  font-size:18px;color:#c3bfb6;text-align:right;
+  font-size:18px;color:var(--ink-faint);text-align:right;
   transition:transform .28s var(--ease),color .22s var(--ease);
 }
 
@@ -114,11 +178,11 @@ body{
   margin-top:40px;
   font-size:13px;
   line-height:1.95;
-  color:#5e5a54;
+  color:var(--ink-mid);
 }
 .hint b{color:var(--ink);font-weight:700;}
 
-/* ================= 二级页 masthead ================= */
+/* ================= masthead ================= */
 .masthead{
   position:relative;
   display:flex;
@@ -170,10 +234,11 @@ body{
 }
 .lede{
   font-size:14px;line-height:1.9;
-  color:#5e5a54;
+  color:var(--ink-mid);
   margin-bottom:32px;
   max-width:40em;
 }
+.lede b{color:var(--ink);font-weight:700;}
 .qtext{
   font-size:24px;font-weight:700;
   line-height:1.4;letter-spacing:-.015em;
@@ -205,17 +270,17 @@ body{
   gap:12px;width:100%;
   padding:17px 20px;
   border:1.5px solid var(--ink);
-  background:var(--ink);color:#fff;
+  background:var(--ink);color:var(--btn-fg);
   font:inherit;font-size:14.5px;font-weight:700;
   letter-spacing:.05em;cursor:pointer;
-  transition:background-color .22s var(--ease),border-color .22s var(--ease),transform .1s var(--ease);
+  transition:background-color .22s var(--ease),border-color .22s var(--ease),color .22s var(--ease),transform .1s var(--ease);
 }
 .btn .ic{font-size:15px;transition:transform .28s var(--ease);flex-shrink:0;}
-.btn:hover{background:var(--red);border-color:var(--red);}
+.btn:hover{background:var(--red);border-color:var(--red);color:#fff;}
 .btn:hover .ic{transform:translateX(4px);}
 .btn:active{transform:scale(.985);}
 .btn.ghost{background:transparent;color:var(--ink);}
-.btn.ghost:hover{background:var(--ink);color:#fff;border-color:var(--ink);}
+.btn.ghost:hover{background:var(--ink);color:var(--btn-fg);border-color:var(--ink);}
 .btn.ghost:hover .ic{transform:none;}
 .btn+.btn{margin-top:10px;}
 
@@ -242,7 +307,7 @@ body{
 }
 .opt::before{
   content:"";position:absolute;left:-6px;right:-6px;top:0;bottom:0;
-  background:rgba(10,10,10,.035);opacity:0;
+  background:var(--overlay);opacity:0;
   transition:opacity .2s var(--ease);pointer-events:none;
 }
 .opt>*{position:relative;z-index:1;}
@@ -257,7 +322,7 @@ body{
 .opt:hover{padding-left:12px;}
 .opt:hover .arrow{opacity:1;transform:translateX(0);}
 .opt.picked{color:var(--red);}
-.opt.picked::before{opacity:1;background:rgba(227,6,19,.08);}
+.opt.picked::before{opacity:1;background:var(--overlay-accent);}
 .opt.picked .num{color:var(--red);}
 .opt.picked .arrow{opacity:1;transform:translateX(0);}
 
@@ -281,12 +346,12 @@ body{
   width:100%;height:82px;
   padding:14px;
   border:1.5px solid var(--line);
-  background:rgba(255,255,255,.35);
+  background:var(--surface);
   font-family:ui-monospace,Menlo,Consolas,monospace;
   font-size:12px;line-height:1.65;
-  color:#333;resize:none;outline:none;
+  color:var(--text-body);resize:none;outline:none;
   word-break:break-all;
-  transition:border-color .22s var(--ease);
+  transition:border-color .22s var(--ease),background-color .28s var(--ease),color .28s var(--ease);
 }
 .codebox:focus{border-color:var(--red);}
 
@@ -301,15 +366,97 @@ body{
 .file-btn{
   display:flex;align-items:center;justify-content:center;gap:10px;
   width:100%;padding:16px;
-  border:1.5px dashed rgba(10,10,10,.22);
-  background:rgba(255,255,255,.25);
-  color:#555;
+  border:1.5px dashed var(--line);
+  background:var(--surface-soft);
+  color:var(--ink-mid);
   font:inherit;font-size:13.5px;font-weight:600;
   cursor:pointer;
   transition:border-color .22s var(--ease),background-color .22s var(--ease),color .22s var(--ease);
 }
-.file-btn:hover{border-color:var(--ink);color:var(--ink);background:rgba(255,255,255,.55);}
+.file-btn:hover{border-color:var(--ink);color:var(--ink);background:var(--surface-hover);}
 .file-btn .ic{font-size:14px;color:var(--red);}
+
+/* ================= 题目编辑器 ================= */
+.qcard{
+  border:1px solid var(--line);
+  background:var(--surface);
+  padding:14px 14px 12px;
+  margin-bottom:12px;
+  transition:border-color .22s var(--ease),background-color .22s var(--ease);
+}
+.qcard:focus-within{
+  border-color:rgba(227,6,19,.42);
+  background:var(--surface-hover);
+}
+.qcard-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;margin-bottom:8px;
+}
+.qcard-num{
+  font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--red);
+}
+.mini-x{
+  width:26px;height:26px;flex-shrink:0;
+  border:0;background:transparent;
+  color:var(--ink-faint);font-size:18px;line-height:1;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:color .18s var(--ease),background-color .18s var(--ease);
+}
+.mini-x:hover{color:var(--red);background:var(--overlay-accent);}
+.mini-x.ghost{pointer-events:none;opacity:0;}
+
+.q-input{
+  width:100%;border:0;
+  border-bottom:1.5px solid var(--line);
+  background:transparent;
+  padding:8px 0;
+  font:inherit;font-size:15px;font-weight:700;
+  color:var(--ink);outline:none;
+  margin-bottom:10px;
+  transition:border-color .22s var(--ease);
+}
+.q-input:focus{border-color:var(--red);}
+.q-input::placeholder{color:var(--ink-faint);font-weight:600;}
+
+.o-list{display:grid;gap:2px;}
+.o-row{
+  display:grid;
+  grid-template-columns:20px 1fr 26px;
+  align-items:center;gap:8px;
+}
+.o-num{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--muted);}
+.o-input{
+  width:100%;border:0;background:transparent;
+  padding:7px 0;
+  font:inherit;font-size:14px;color:var(--ink);
+  outline:none;
+  border-bottom:1px solid transparent;
+  transition:border-color .2s var(--ease);
+}
+.o-input:focus{border-bottom-color:var(--red);}
+.o-input::placeholder{color:var(--ink-faint);}
+
+.mini-add{
+  margin-top:10px;border:0;background:transparent;
+  color:var(--muted);font:inherit;
+  font-size:12px;font-weight:700;letter-spacing:.06em;
+  cursor:pointer;padding:4px 0;
+  transition:color .18s var(--ease);
+}
+.mini-add:hover{color:var(--red);}
+
+.add-q{
+  display:block;width:100%;padding:15px;
+  border:1.5px dashed var(--line);
+  background:var(--surface-soft);
+  color:var(--ink-mid);font:inherit;
+  font-size:13.5px;font-weight:700;
+  cursor:pointer;
+  margin-bottom:18px;
+  transition:border-color .22s var(--ease),background-color .22s var(--ease),color .22s var(--ease);
+}
+.add-q:hover{border-color:var(--ink);color:var(--ink);background:var(--surface-hover);}
 
 /* ================= 分数 ================= */
 .score-num{
@@ -340,25 +487,25 @@ body{
   display:grid;grid-template-columns:30px 1fr 18px;
   gap:10px;align-items:baseline;margin-bottom:9px;
 }
-.cmp-num{font-size:10px;font-weight:700;letter-spacing:.1em;color:#c3bfb6;}
-.cmp-q{font-size:13.5px;line-height:1.55;color:#3a3a3a;font-weight:600;}
+.cmp-num{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--ink-faint);}
+.cmp-q{font-size:13.5px;line-height:1.55;color:var(--text-strong);font-weight:600;}
 .cmp-mark{font-size:13px;font-weight:800;text-align:right;}
 .cmp-row.ok .cmp-mark{color:var(--red);}
-.cmp-row.no .cmp-mark{color:#c3bfb6;}
+.cmp-row.no .cmp-mark{color:var(--ink-faint);}
 .cmp-ans{display:flex;flex-wrap:wrap;gap:7px;padding-left:40px;}
 .tag{
   display:inline-flex;align-items:center;gap:5px;
   padding:4px 9px;font-size:11.5px;font-weight:600;
   border:1px solid var(--line);
-  background:rgba(255,255,255,.35);
-  color:#4a4a4a;
+  background:var(--surface);
+  color:var(--text-tag);
 }
 .tag em{
   font-style:normal;font-size:9px;font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;color:#b5b1a9;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--tag-label);
 }
-.cmp-row.ok .tag{border-color:rgba(227,6,19,.3);background:rgba(227,6,19,.08);color:#9d0a15;}
-.cmp-row.ok .tag em{color:#d98d94;}
+.cmp-row.ok .tag{border-color:rgba(227,6,19,.3);background:var(--overlay-accent);color:var(--red-deep);}
+.cmp-row.ok .tag em{color:var(--red-soft);}
 
 /* ================= 回顾 ================= */
 .review-row{
@@ -368,18 +515,18 @@ body{
   font-size:13px;
 }
 .review-row:last-child{border-bottom:0;}
-.review-num{font-size:10px;font-weight:700;letter-spacing:.1em;color:#c3bfb6;}
-.review-q{color:#666;line-height:1.55;}
+.review-num{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--ink-faint);}
+.review-q{color:var(--text-body);line-height:1.55;}
 .review-a{font-weight:700;}
 
 /* ================= Toast ================= */
 #toast{
-  position:fixed;left:50%;bottom:36px;
+  position:fixed;left:50%;bottom:84px;
   transform:translate(-50%,20px);
-  background:var(--ink);color:#fff;
+  background:var(--toast-bg);color:var(--toast-fg);
   font-size:13px;font-weight:600;letter-spacing:.04em;
   padding:12px 22px;opacity:0;pointer-events:none;
-  transition:opacity .24s var(--ease),transform .24s var(--ease);
+  transition:opacity .24s var(--ease),transform .24s var(--ease),background-color .28s var(--ease),color .28s var(--ease);
   z-index:9999;max-width:82%;text-align:center;
   white-space:pre-line;
 }
@@ -395,19 +542,17 @@ body{
 
 /* ================= 桌面端 ================= */
 @media (min-width:900px){
-  #app{max-width:1100px;padding:56px 56px 120px;}
+  #app{max-width:1100px;padding:56px 56px 160px;}
 
-  /* 首页左右两栏 */
+  .theme-toggle{bottom:32px;right:32px;padding:9px 16px;font-size:11px;}
+
   .home{
     grid-template-columns:1.05fr 1fr;
     gap:80px;
     align-items:start;
     min-height:calc(100vh - 220px);
   }
-  .home-left{
-    position:sticky;
-    top:56px;
-  }
+  .home-left{position:sticky;top:56px;}
   .home-title{font-size:80px;letter-spacing:-.04em;margin-bottom:38px;}
   .home-title .t-thin{margin-bottom:6px;}
   .home-brand{padding-left:4px;}
@@ -422,7 +567,6 @@ body{
   .mode-arrow{font-size:20px;}
   .hint{margin-top:52px;font-size:14px;}
 
-  /* 二级页面 */
   .masthead{padding-bottom:22px;margin-bottom:48px;}
   .brand{font-size:12px;}
   .step{font-size:11.5px;}
@@ -446,21 +590,28 @@ body{
   .tag{font-size:12.5px;padding:5px 11px;}
   .review-row{padding:14px 0;font-size:14px;}
 
-  /* 二级页面限制宽度，避免在大屏上过宽 */
+  .qcard{padding:18px 18px 14px;margin-bottom:14px;}
+  .q-input{font-size:16px;padding:10px 0;}
+  .o-input{font-size:15px;padding:9px 0;}
+  .mini-add{font-size:12.5px;}
+  .add-q{padding:18px;font-size:14px;}
+
   .masthead,.page-body{max-width:760px;}
+  #toast{bottom:96px;}
 }
 </style>
 </head>
 <body>
 <div id="app"></div>
+<button class="theme-toggle" id="themeToggle" type="button" aria-label="切换主题">DARK</button>
 <script>
 (function(){
 'use strict';
 
 /* ============================================================
-   题库
+   默认题库
    ============================================================ */
-var QUESTIONS = [
+var DEFAULT_QUESTIONS = [
   { q:'{who}最喜欢的季节是？',          options:['春天','夏天','秋天','冬天'] },
   { q:'周末{who}更想做什么？',          options:['宅家躺平','出门逛逛','睡到自然醒','运动出汗'] },
   { q:'吃火锅{who}必点的是？',          options:['毛肚','肥牛','虾滑','土豆'] },
@@ -472,14 +623,63 @@ var QUESTIONS = [
   { q:'手机电量低于多少{who}会焦虑？',  options:['50%','30%','20%','10%'] },
   { q:'{who}心情不好时更想？',          options:['一个人静静','找人倾诉','吃顿好的','睡一觉'] }
 ];
-var TOTAL = QUESTIONS.length;
 
-var QHASH = (function(){
-  var str = JSON.stringify(QUESTIONS);
+var MAX_QUESTIONS = 20;
+var MAX_Q_LEN     = 40;
+var MAX_O_LEN     = 16;
+var MIN_OPTIONS   = 2;
+var MAX_OPTIONS   = 6;
+
+function cloneQuestions(qs){
+  return qs.map(function(q){ return { q:q.q, options:q.options.slice() }; });
+}
+
+/* ============================================================
+   紧凑题库编码
+   题目之间用 \n，字段之间用 \t
+   形如：题干\t选项1\t选项2\t选项3\n题干2\t选项1\t选项2
+   ============================================================ */
+var QSEP = '\n';
+var FSEP = '\t';
+
+function encodeQs(qs){
+  var lines = [];
+  for (var i = 0; i < qs.length; i++){
+    lines.push([qs[i].q].concat(qs[i].options).join(FSEP));
+  }
+  return lines.join(QSEP);
+}
+
+function decodeQs(str){
+  if (!str) return null;
+  var lines = str.split(QSEP);
+  if (!lines.length || lines.length > MAX_QUESTIONS) return null;
+  var out = [];
+  for (var i = 0; i < lines.length; i++){
+    var parts = lines[i].split(FSEP);
+    if (parts.length < MIN_OPTIONS + 1 || parts.length > MAX_OPTIONS + 1) return null;
+    var q = parts[0].trim();
+    if (!q || q.length > MAX_Q_LEN) return null;
+    var opts = [];
+    for (var j = 1; j < parts.length; j++){
+      var o = parts[j].trim();
+      if (!o || o.length > MAX_O_LEN) return null;
+      opts.push(o);
+    }
+    out.push({ q: q, options: opts });
+  }
+  return out;
+}
+
+/* 题库指纹：由紧凑编码决定 */
+function qhashOf(qs){
+  var str = encodeQs(qs);
   var h = 5381;
   for (var i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
   return (h >>> 0).toString(36).slice(0, 5);
-})();
+}
+
+var DEFAULT_HASH = qhashOf(DEFAULT_QUESTIONS);
 
 /* ============================================================
    加密
@@ -512,26 +712,41 @@ function decrypt(b64){
   return new TextDecoder().decode(dec);
 }
 
+/* ---------- 生成码 ----------
+   题目码 payload：[hash, name, answers]  或  [hash, name, answers, qs]
+   答卷码 payload：[hash, creator, cAns, player, pAns]  或  + qs
+   只有当题库非默认时才携带 qs，默认情况下配置文件极短。
+   ============================================================ */
 function buildQuizCode(){
-  return 'M1' + encrypt(QHASH + SEP + state.name + SEP + state.answers.join(''));
+  var qs = state.questions || DEFAULT_QUESTIONS;
+  var h = qhashOf(qs);
+  var parts = [h, state.name, state.answers.join('')];
+  if (h !== DEFAULT_HASH) parts.push(encodeQs(qs));
+  return 'M1' + encrypt(parts.join(SEP));
 }
+
 function buildAnswerCode(){
-  return 'M2' + encrypt([
-    QHASH,
+  var qs = state.cfg.q;
+  var h = qhashOf(qs);
+  var parts = [
+    h,
     state.cfg.c,
     state.cfg.a.join(''),
     state.name,
     state.answers.join('')
-  ].join(SEP));
+  ];
+  if (h !== DEFAULT_HASH) parts.push(encodeQs(qs));
+  return 'M2' + encrypt(parts.join(SEP));
 }
 
-function parseAnsStr(s, total){
-  if (!s || s.length !== total) return null;
+/* ---------- 解析码 ---------- */
+function parseAnsStr(s, questions){
+  if (!s || s.length !== questions.length) return null;
   var out = [];
-  for (var i = 0; i < total; i++){
+  for (var i = 0; i < questions.length; i++){
     var c = s.charCodeAt(i) - 48;
     if (c < 0 || c > 9) return null;
-    if (c >= QUESTIONS[i].options.length) return null;
+    if (c >= questions[i].options.length) return null;
     out.push(c);
   }
   return out;
@@ -544,12 +759,23 @@ function parseQuizCode(raw){
   try{
     var payload = decrypt(str.slice(2));
     var parts = payload.split(SEP);
-    if (parts.length !== 3) return { err:'题目码内容不完整' };
-    if (parts[0] !== QHASH) return { err:'题目码与当前题库版本不一致' };
+    if (parts.length !== 3 && parts.length !== 4) return { err:'题目码内容不完整' };
+
+    var qs;
+    if (parts.length === 3){
+      if (parts[0] !== DEFAULT_HASH) return { err:'题目码与当前版本不一致' };
+      qs = DEFAULT_QUESTIONS;
+    } else {
+      qs = decodeQs(parts[3]);
+      if (!qs) return { err:'题目码中的题目无法解析' };
+      if (parts[0] !== qhashOf(qs)) return { err:'题目码校验未通过，可能被改动过' };
+    }
+
     var name = (parts[1] || '').trim() || '对方';
-    var answers = parseAnsStr(parts[2], TOTAL);
+    var answers = parseAnsStr(parts[2], qs);
     if (!answers) return { err:'题目码答案部分无法解析' };
-    return { q: QUESTIONS, c: name, a: answers };
+
+    return { q: qs, c: name, a: answers };
   }catch(e){
     return { err:'题目码解密失败，请确认码是否完整' };
   }
@@ -562,13 +788,24 @@ function parseAnswerCode(raw){
   try{
     var payload = decrypt(str.slice(2));
     var parts = payload.split(SEP);
-    if (parts.length !== 5) return { err:'答卷码内容不完整' };
-    if (parts[0] !== QHASH) return { err:'答卷码与当前题库版本不一致' };
-    var creatorAns = parseAnsStr(parts[2], TOTAL);
-    var playerAns  = parseAnsStr(parts[4], TOTAL);
+    if (parts.length !== 5 && parts.length !== 6) return { err:'答卷码内容不完整' };
+
+    var qs;
+    if (parts.length === 5){
+      if (parts[0] !== DEFAULT_HASH) return { err:'答卷码与当前版本不一致' };
+      qs = DEFAULT_QUESTIONS;
+    } else {
+      qs = decodeQs(parts[5]);
+      if (!qs) return { err:'答卷码中的题目无法解析' };
+      if (parts[0] !== qhashOf(qs)) return { err:'答卷码校验未通过，可能被改动过' };
+    }
+
+    var creatorAns = parseAnsStr(parts[2], qs);
+    var playerAns  = parseAnsStr(parts[4], qs);
     if (!creatorAns || !playerAns) return { err:'答卷码答案部分无法解析' };
+
     return {
-      q: QUESTIONS,
+      q: qs,
       c: (parts[1] || '').trim() || '出题人',
       a: creatorAns,
       p: (parts[3] || '').trim() || '答题人',
@@ -588,11 +825,38 @@ var state = {
   name: '',
   idx: 0,
   answers: [],
+  questions: null,
+  draft: null,
   cfg: null
 };
 var busy = false;
 var lastProgress = 0;
 var app = document.getElementById('app');
+
+function activeQuestions(){
+  if (state.view === 'create') return state.questions || DEFAULT_QUESTIONS;
+  if (state.cfg && state.cfg.q) return state.cfg.q;
+  return DEFAULT_QUESTIONS;
+}
+
+/* ============================================================
+   主题切换
+   ============================================================ */
+function applyTheme(theme){
+  if (theme === 'dark'){
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
+  var btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = theme === 'dark' ? 'LIGHT' : 'DARK';
+  try{ localStorage.setItem('sta-theme', theme); }catch(e){}
+}
+
+function toggleTheme(){
+  var cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  applyTheme(cur === 'dark' ? 'light' : 'dark');
+}
 
 /* ============================================================
    工具
@@ -664,6 +928,8 @@ function goHome(){
   state.cfg = null;
   state.name = '';
   state.answers = [];
+  state.questions = null;
+  state.draft = null;
   state.idx = 0;
   lastProgress = 0;
   render();
@@ -675,12 +941,20 @@ function openView(v){
   state.cfg = null;
   state.name = '';
   state.answers = [];
+  state.questions = null;
+  state.draft = null;
   state.idx = 0;
   lastProgress = 0;
   if (v === 'create') state.step = 'name';
   if (v === 'join')   state.step = 'input';
   if (v === 'view')   state.step = 'input';
   render();
+}
+
+function renderKeepScroll(){
+  var y = window.scrollY || window.pageYOffset || 0;
+  render();
+  window.scrollTo(0, y);
 }
 
 /* ============================================================
@@ -735,7 +1009,7 @@ function bindAll(){
         ev.preventDefault();
         var action = el.getAttribute('data-action');
         try{
-          handleAction(action);
+          handleAction(action, el);
         }catch(err){
           toast('操作出错：' + err.message);
         }
@@ -783,12 +1057,12 @@ function renderHome(){
       '</div>' +
       '<div class="home-right">' +
         '<div class="modes">' +
-          modeCard(1, '出题', '设置自己的答案，生成一段题目码发给对方', 'create') +
+          modeCard(1, '出题', '自定义题目与选项，设置自己的答案，生成题目码发给对方', 'create') +
           modeCard(2, '答题', '粘贴对方发来的题目码，猜猜 TA 会怎么选', 'join') +
           modeCard(3, '看结果', '粘贴答题人发回的答卷码，查看你们的默契度', 'view') +
         '</div>' +
         '<p class="hint">' +
-          '<b>出题人</b> → 生成题目码 → 微信发给对方<br>' +
+          '<b>出题人</b> → 编辑题目 → 生成题目码 → 微信发给对方<br>' +
           '<b>答题人</b> → 粘贴题目码 → 逐题作答 → 生成答卷码 → 发回<br>' +
           '<b>出题人</b> → 粘贴答卷码 → 立刻看到默契度' +
         '</p>' +
@@ -819,12 +1093,13 @@ function renderPage(){
 
   if (v === 'create'){
     if (s === 'name')        html += viewCreateName();
-    else if (s === 'answer') html += viewAnswer(true);
+    else if (s === 'setup')  html += viewCreateSetup();
+    else if (s === 'answer') html += viewAnswer();
     else if (s === 'done')   html += viewCreateDone();
   } else if (v === 'join'){
     if (s === 'input')       html += viewJoinInput();
     else if (s === 'name')   html += viewJoinName();
-    else if (s === 'answer') html += viewAnswer(false);
+    else if (s === 'answer') html += viewAnswer();
     else if (s === 'done')   html += viewJoinDone();
   } else if (v === 'view'){
     if (s === 'input')       html += viewViewInput();
@@ -838,39 +1113,88 @@ function renderPage(){
 function getStepLabel(){
   var v = state.view, s = state.step;
   if (v === 'create'){
-    if (s === 'name') return 'Step 01 / 03';
-    if (s === 'answer') return 'Step 02 / 03';
-    if (s === 'done') return 'Step 03 / 03';
+    if (s === 'name')   return 'Step 01 / 04';
+    if (s === 'setup')  return 'Step 02 / 04';
+    if (s === 'answer') return 'Step 03 / 04';
+    if (s === 'done')   return 'Step 04 / 04';
   }
   if (v === 'join'){
-    if (s === 'input') return 'Step 01 / 04';
-    if (s === 'name') return 'Step 02 / 04';
+    if (s === 'input')  return 'Step 01 / 04';
+    if (s === 'name')   return 'Step 02 / 04';
     if (s === 'answer') return 'Step 03 / 04';
-    if (s === 'done') return 'Step 04 / 04';
+    if (s === 'done')   return 'Step 04 / 04';
   }
   if (v === 'view'){
-    if (s === 'input') return 'Step 01 / 02';
+    if (s === 'input')  return 'Step 01 / 02';
     if (s === 'result') return 'Step 02 / 02';
   }
   return '';
 }
 
-/* ---------- 出题 ---------- */
+/* ---------- 出题：姓名 ---------- */
 function viewCreateName(){
   return '' +
     '<p class="eyebrow">出题</p>' +
-    '<h2 class="page-title">先写下你的答案</h2>' +
-    '<p class="lede">设置好你自己的选择，生成一段题目码发给对方。对方答完把答卷码发回，你粘贴就能看到默契度。</p>' +
+    '<h2 class="page-title">先写下你的名字</h2>' +
+    '<p class="lede">下一步可以自由增删题目、编辑题干和选项；也可以直接用默认题库。设置好你自己的答案后，会生成一段题目码发给对方。</p>' +
     '<label class="field"><span class="field-label">你的名字</span>' +
       '<input id="myName" maxlength="8" placeholder="例如：小 A" value="' + esc(state.name) + '" autocomplete="off">' +
     '</label>' +
-    '<button class="btn" data-action="create-start" type="button">开始设置答案 <span class="ic">→</span></button>' +
+    '<button class="btn" data-action="create-name" type="button">下一步：设置题目 <span class="ic">→</span></button>' +
     '<button class="btn ghost" data-action="home" type="button" style="margin-top:10px">← 返回首页</button>';
 }
 
+/* ---------- 出题：题目编辑器 ---------- */
+function viewCreateSetup(){
+  var draft = (state.draft && state.draft.length) ? state.draft : cloneQuestions(DEFAULT_QUESTIONS);
+
+  var cards = draft.map(function(item, i){
+    var optRows = item.options.map(function(o, j){
+      var del = item.options.length > MIN_OPTIONS
+        ? '<button class="mini-x" data-action="del-o" data-i="' + i + '" data-j="' + j + '" type="button" title="删除选项">×</button>'
+        : '<span class="mini-x ghost"></span>';
+      return '<div class="o-row">' +
+        '<span class="o-num">' + String.fromCharCode(65 + j) + '</span>' +
+        '<input class="o-input" maxlength="' + MAX_O_LEN + '" value="' + esc(o) + '" placeholder="选项内容">' +
+        del +
+      '</div>';
+    }).join('');
+
+    return '<div class="qcard" data-i="' + i + '">' +
+      '<div class="qcard-head">' +
+        '<span class="qcard-num">Q' + pad(i + 1) + '</span>' +
+        (draft.length > 1
+          ? '<button class="mini-x" data-action="del-q" data-i="' + i + '" type="button" title="删除题目">×</button>'
+          : '<span class="mini-x ghost"></span>') +
+      '</div>' +
+      '<input class="q-input" maxlength="' + MAX_Q_LEN + '" value="' + esc(item.q) + '" placeholder="输入问题，可用 {who} 代表答题对象">' +
+      '<div class="o-list">' + optRows + '</div>' +
+      (item.options.length < MAX_OPTIONS
+        ? '<button class="mini-add" data-action="add-o" data-i="' + i + '" type="button">+ 添加选项</button>'
+        : '') +
+    '</div>';
+  }).join('');
+
+  return '' +
+    '<p class="eyebrow">出题</p>' +
+    '<h2 class="page-title">自定义题目</h2>' +
+    '<p class="lede">直接修改下面的题干和选项即可。题目里写 <b>{who}</b> 会自动替换成答题对象的名字，例如「{who}最喜欢的季节是？」。每题至少 2 个、最多 6 个选项。</p>' +
+    '<div class="qcard-head" style="margin-bottom:10px">' +
+      '<span class="qcard-num">共 ' + draft.length + ' / ' + MAX_QUESTIONS + ' 题</span>' +
+    '</div>' +
+    cards +
+    (draft.length < MAX_QUESTIONS
+      ? '<button class="add-q" data-action="add-q" type="button">+ 添加一道题目</button>'
+      : '<p class="lede" style="margin-bottom:18px">已达到 ' + MAX_QUESTIONS + ' 题上限。</p>') +
+    '<button class="btn" data-action="create-start" type="button">开始设置我的答案 <span class="ic">→</span></button>' +
+    '<button class="btn ghost" data-action="reset-q" type="button" style="margin-top:10px">恢复默认题库</button>' +
+    '<button class="btn ghost" data-action="home" type="button" style="margin-top:10px">← 返回首页</button>';
+}
+
+/* ---------- 出题：完成 ---------- */
 function viewCreateDone(){
   var code = buildQuizCode();
-  var rows = QUESTIONS.map(function(q, i){
+  var rows = state.questions.map(function(q, i){
     return '<div class="review-row">' +
       '<span class="review-num">' + pad(i+1) + '</span>' +
       '<span class="review-q">' + esc(q.q.replace('{who}','你')) + '</span>' +
@@ -881,7 +1205,7 @@ function viewCreateDone(){
   return '' +
     '<p class="eyebrow">题目码已生成</p>' +
     '<h2 class="page-title">复制发给对方</h2>' +
-    '<p class="lede">把下面这段短码整段复制，微信 / QQ 发给对方。对方选「答题」粘贴就能开始。</p>' +
+    '<p class="lede">把下面这段短码整段复制，微信 / QQ 发给对方。对方选「答题」粘贴就能开始 —— 你自定义的题目也在码里。</p>' +
     '<textarea class="codebox" readonly>' + esc(code) + '</textarea>' +
     '<div class="btn-row">' +
       '<button class="btn" data-action="copy-code" type="button">复制题目码 <span class="ic">⧉</span></button>' +
@@ -891,7 +1215,7 @@ function viewCreateDone(){
     '<div>' + rows + '</div>';
 }
 
-/* ---------- 答题 ---------- */
+/* ---------- 答题：粘贴题目码 ---------- */
 function viewJoinInput(){
   return '' +
     '<p class="eyebrow">答题</p>' +
@@ -934,16 +1258,18 @@ function viewJoinDone(){
 }
 
 /* ---------- 作答 ---------- */
-function viewAnswer(isCreate){
-  var qs = isCreate ? QUESTIONS : state.cfg.q;
+function viewAnswer(){
+  var qs = activeQuestions();
+  var total = qs.length;
   var q = qs[state.idx];
+  var isCreate = state.view === 'create';
   var who = isCreate ? '你' : state.cfg.c;
   var eyebrow = isCreate ? '设置你的答案' : '猜 ' + esc(state.cfg.c) + ' 会怎么选';
 
   return '' +
     '<div class="p-head"><span>' + eyebrow + '</span>' +
-      '<span><b>' + pad(state.idx+1) + '</b> / ' + pad(TOTAL) + '</span></div>' +
-    progressBar(state.idx / TOTAL) +
+      '<span><b>' + pad(state.idx+1) + '</b> / ' + pad(total) + '</span></div>' +
+    progressBar(state.idx / total) +
     '<h2 class="qtext">' + esc(q.q.replace('{who}', who)) + '</h2>' +
     '<div class="options">' +
       q.options.map(function(o, i){
@@ -1021,6 +1347,56 @@ function comment(s){
 }
 
 /* ============================================================
+   编辑器数据同步 / 校验
+   ============================================================ */
+function syncEditor(){
+  var cards = app.querySelectorAll('.qcard');
+  if (!cards.length) return;
+
+  var arr = [];
+  for (var i = 0; i < cards.length; i++){
+    var card = cards[i];
+    var qi = card.querySelector('.q-input');
+    var qv = qi ? qi.value : '';
+
+    var opts = [];
+    var ois = card.querySelectorAll('.o-input');
+    for (var j = 0; j < ois.length; j++) opts.push(ois[j].value);
+
+    if (!qv.trim() && !opts.join('').trim()) continue;
+
+    arr.push({ q: qv, options: opts });
+  }
+  state.draft = arr;
+}
+
+function validateDraft(arr){
+  if (!arr || !arr.length) return { err:'至少需要 1 道题目' };
+  if (arr.length > MAX_QUESTIONS) return { err:'最多 ' + MAX_QUESTIONS + ' 道题目' };
+
+  var out = [];
+  for (var i = 0; i < arr.length; i++){
+    var item = arr[i];
+    var text = String(item.q || '').trim();
+    if (!text) return { err:'第 ' + (i+1) + ' 题的题目不能为空' };
+    if (text.length > MAX_Q_LEN) return { err:'第 ' + (i+1) + ' 题的题目太长' };
+
+    var opts = [];
+    for (var j = 0; j < item.options.length; j++){
+      var o = String(item.options[j] || '').trim();
+      if (!o) return { err:'第 ' + (i+1) + ' 题的第 ' + (j+1) + ' 个选项不能为空' };
+      if (o.length > MAX_O_LEN) return { err:'第 ' + (i+1) + ' 题选项太长' };
+      opts.push(o);
+    }
+    if (opts.length < MIN_OPTIONS) return { err:'第 ' + (i+1) + ' 题至少需要 2 个选项' };
+    if (opts.length > MAX_OPTIONS) return { err:'第 ' + (i+1) + ' 题最多 6 个选项' };
+
+    out.push({ q: text, options: opts });
+  }
+  return { ok:true, questions: out };
+}
+
+/* ============================================================
    动画
    ============================================================ */
 function progressBar(r){
@@ -1062,7 +1438,7 @@ function countUp(el, target, dur){
 /* ============================================================
    动作分发
    ============================================================ */
-function handleAction(a){
+function handleAction(a, el){
   if (a === 'home'){ goHome(); return; }
 
   if (a === 'copy-code'){
@@ -1080,11 +1456,67 @@ function handleAction(a){
     return;
   }
 
-  if (a === 'create-start'){
+  if (a === 'create-name'){
     var input = document.getElementById('myName');
     var n = (input ? input.value : '').trim();
     if (!n){ toast('请先输入名字'); return; }
     state.name = n.slice(0, 8);
+    state.draft = cloneQuestions(DEFAULT_QUESTIONS);
+    state.step = 'setup';
+    render();
+    return;
+  }
+
+  if (a === 'add-q'){
+    syncEditor();
+    if (state.draft.length >= MAX_QUESTIONS){ toast('最多 ' + MAX_QUESTIONS + ' 道题目'); return; }
+    state.draft.push({ q:'', options:['','',''] });
+    renderKeepScroll();
+    return;
+  }
+
+  if (a === 'del-q'){
+    syncEditor();
+    var dq = +el.getAttribute('data-i');
+    if (state.draft.length <= 1){ toast('至少保留 1 道题目'); return; }
+    state.draft.splice(dq, 1);
+    renderKeepScroll();
+    return;
+  }
+
+  if (a === 'add-o'){
+    syncEditor();
+    var ao = +el.getAttribute('data-i');
+    if (!state.draft[ao]) return;
+    if (state.draft[ao].options.length >= MAX_OPTIONS){ toast('每题最多 6 个选项'); return; }
+    state.draft[ao].options.push('');
+    renderKeepScroll();
+    return;
+  }
+
+  if (a === 'del-o'){
+    syncEditor();
+    var doi = +el.getAttribute('data-i');
+    var doj = +el.getAttribute('data-j');
+    if (!state.draft[doi]) return;
+    if (state.draft[doi].options.length <= MIN_OPTIONS){ toast('每题至少 2 个选项'); return; }
+    state.draft[doi].options.splice(doj, 1);
+    renderKeepScroll();
+    return;
+  }
+
+  if (a === 'reset-q'){
+    state.draft = cloneQuestions(DEFAULT_QUESTIONS);
+    toast('已恢复默认题库');
+    renderKeepScroll();
+    return;
+  }
+
+  if (a === 'create-start'){
+    syncEditor();
+    var v = validateDraft(state.draft);
+    if (v.err){ toast(v.err); return; }
+    state.questions = v.questions;
     state.idx = 0;
     state.answers = [];
     lastProgress = 0;
@@ -1096,8 +1528,7 @@ function handleAction(a){
   if (a === 'join-parse'){
     var input2 = document.getElementById('codeInput');
     if (!input2){ toast('找不到输入框，请刷新页面'); return; }
-    var raw = input2.value || '';
-    var res = parseQuizCode(raw);
+    var res = parseQuizCode(input2.value || '');
     if (res.err){ toast(res.err); return; }
     state.cfg = res;
     state.idx = 0;
@@ -1125,8 +1556,7 @@ function handleAction(a){
   if (a === 'view-parse'){
     var input4 = document.getElementById('codeInput');
     if (!input4){ toast('找不到输入框，请刷新页面'); return; }
-    var raw2 = input4.value || '';
-    var res2 = parseAnswerCode(raw2);
+    var res2 = parseAnswerCode(input4.value || '');
     if (res2.err){ toast(res2.err); return; }
     state.cfg = res2;
     state.step = 'result';
@@ -1143,10 +1573,11 @@ function handlePick(i, btn){
   btn.classList.add('picked');
 
   setTimeout(function(){
+    var qs = activeQuestions();
     state.answers[state.idx] = i;
     state.idx++;
 
-    if (state.idx >= TOTAL){
+    if (state.idx >= qs.length){
       state.step = 'done';
     }
     busy = false;
@@ -1158,6 +1589,14 @@ function handlePick(i, btn){
    启动
    ============================================================ */
 render();
+
+(function initTheme(){
+  var saved = 'light';
+  try{ saved = localStorage.getItem('sta-theme') || 'light'; }catch(e){}
+  applyTheme(saved);
+  var btn = document.getElementById('themeToggle');
+  if (btn) btn.addEventListener('click', toggleTheme);
+})();
 
 })();
 </script>
